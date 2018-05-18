@@ -1,0 +1,43 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <NoWarn>NU1605</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Akka" Version="1.3.5" />
+    <PackageReference Include="Serilog" Version="2.6.0" />
+    <PackageReference Include="Akka.Logger.Serilog" Version="1.3.3" />
+    <PackageReference Include="Akka.Cluster.Tools" Version="1.3.5" />
+    <PackageReference Include="Akka.Serialization.Hyperion" Version="1.3.5-beta60" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />
+    <PackageReference Include="Akka.Cluster" Version="1.3.5" />
+    <Content Include="Interfaces\IRemotingConfig.cs" />
+    <Content Include="Interfaces\IClusterConfig.cs" />
+    <Content Include="Configuration\ConfigurationFactories.cs" />
+    <Content Include="Configuration\DefaultClusterConfig.cs" />
+    <Content Include="Configuration\DefaultRemotingConfig.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AkkaLibrary.Common\AkkaLibrary.Common.csproj" />
+    <Content Include="Interfaces\IPluginCommand.cs" />
+    <Content Include="Actors\PluginManager.cs" />
+    <Content Include="Actors\BeaconManager.cs" />
+    <Content Include="Actors\ConfigurationDistributor.cs" />
+    <Content Include="Configuration\BeaconNodeConstants.cs" />
+    <Content Include="Configuration\RouterConfigurationFactories.cs" />
+    <Content Include="Actors\ClusterMonitor.cs" />
+    <Content Include="Configuration\ClusterConfigs.cs" />
+    <Content Include="Actors\NodeConfigurator.cs" />
+    <Content Include="Interfaces\INodeCommand.cs" />
+    <Content Include="Actors\NodeManager.cs" />
+    <Content Include="Actors\Helpers\LogConfirmationActor.cs" />
+    <Content Include="Actors\Helpers\RandomLoggerActor.cs" />
+    <Content Include="Actors\ClusterCommandActor.cs" />
+    <Content Include="Actors\GossipActor.cs" />
+    <Content Include="Configuration\DefaultClusterPropsFactory.cs" />
+    <Content Include="Configuration\ClusterNodeConstants.cs" />
+    <Content Include="Configuration\SystemConfiguration.cs" />
+  </ItemGroup>
+</Project>
