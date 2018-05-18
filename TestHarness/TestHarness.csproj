@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <NoWarn>NU1605</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../AkkaLibrary/AkkaLibrary.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Program.cs" />
+    <Content Include="AkkaSystemTest.cs" />
+    <Content Include="TestPlugin.cs" />
+    <Content Include="TestPluginConfiguration.cs" />
+    <Content Include="LogActor.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Akka.Streams" Version="1.3.5" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,90 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <NoWarn>NU1605</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="NETCoreAsio" Version="1.0.0" />
+    <PackageReference Include="NETCoreNetworkComms" Version="1.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="2.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="2.0.0" />
+    <PackageReference Include="Akka" Version="1.3.5" />
+    <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="2.0.0" />
+    <PackageReference Include="Akka.Streams" Version="1.3.5" />
+    <PackageReference Include="Akka.Remote" Version="1.3.5" />
+    <PackageReference Include="Akka.Cluster" Version="1.3.5" />
+    <PackageReference Include="Akka.Logger.Serilog" Version="1.3.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="9.0.1" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="BaseClasses\BaseActor.cs" />
+    <Content Include="Factories\SystemFactory.cs" />
+    <Content Include="SingletonActors\PluginDataRegistry.cs" />
+    <Content Include="SingletonActors\PluginStatusMonitor.cs" />
+    <Content Include="SingletonActors\ServiceDispatcher.cs" />
+    <Content Include="SingletonActors\ConsoleReadActor.cs" />
+    <Content Include="Serial\SerialPortActor.cs" />
+    <Content Include="Serial\SerialPortSupervisor.cs" />
+    <Content Include="IOReceiveHandlers\ReceiveUntil.cs" />
+    <Content Include="RetryConnector.cs" />
+    <Content Include="NetworkCommsActors\RetryConnector.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="appsettings.json" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TcpActors\TcpSupervisorActor.cs" />
+    <Content Include="TcpActors\TcpConnectionActor.cs" />
+    <Content Include="TcpActors\TcpConnectionReceiverActor.cs" />
+    <Content Include="IOReceiveHandlers\DelimitedReceiverActor.cs" />
+    <Content Include="ServiceScaffold\PluginRegistry.cs" />
+    <Content Include="ServiceScaffold\PluginStatusReporterActor.cs" />
+    <Content Include="ServiceScaffold\PluginSupervisorActor.cs" />
+    <Content Include="ServiceScaffold\DataTopic.cs" />
+    <Content Include="ServiceScaffold\PluginSystem.cs" />
+    <Content Include="ServiceScaffold\PluginSystemFactory.cs" />
+    <Content Include="BaseClasses\BasePluginConfiguration.cs" />
+    <Content Include="SystemFactories\SystemFactory.cs" />
+    <Content Include="System\PluginSystem.cs" />
+    <Content Include="System\Factories\PluginSystemFactory.cs" />
+    <Content Include="System\SystemFactory.cs" />
+    <Content Include="BaseClasses\BasePluginActor.cs" />
+    <Content Include="FpgaAcquisition\ChannelType.cs" />
+    <Content Include="FpgaAcquisition\FpgaAcquisitionConfiguration.cs" />
+    <Content Include="FpgaAcquisition\FpgaAcquisitionConfiguration.cs" />
+    <Content Include="FpgaAcquisition\FpgaAcquisitionPluginActor.cs" />
+    <Content Include="FpgaAcquisition\FpgaSample.cs" />
+    <Content Include="FpgaAcquisition\FpgaSampleAssemblerActor.cs" />
+    <Content Include="FpgaAcquisition\Program.cs" />
+    <Content Include="FpgaAcquisition\FpgaPluginMessages.cs" />
+    <Content Include="FpgaAcquisition\FpgaDelimitingActor.cs" />
+    <Content Include="FpgaAcquisition\FpgaConnectionActor.cs" />
+    <Content Include="FpgaAcquisition\FpgaChannel.cs" />
+    <Content Include="FpgaConversion\Unit.cs" />
+    <Content Include="FpgaConversion\FpgaConversionPluginActor.cs" />
+    <Content Include="FpgaConversion\DataChannel.cs" />
+    <Content Include="FpgaConversion\ChannelData.cs" />
+    <Content Include="BaseClasses\SyncableBase.cs" />
+    <Content Include="DataSynchronisation\DataSynchroniserPluginActor.cs" />
+    <Content Include="DataSynchronisation\DataSynchroniserMessages.cs" />
+    <Content Include="DataSynchronisation\SampleAssembler.cs" />
+    <Content Include="DataSynchronisation\MergeManager.cs" />
+    <Content Include="DataSynchronisation\StreamInputActor.cs" />
+    <Content Include="DataSynchronisation\IdentifierExtensions.cs" />
+    <Content Include="DataSynchronisation\ExtractionExpressionBuilder.cs" />
+    <Content Include="DataSynchronisation\OutputExpressionBuilder.cs" />
+    <Content Include="SignalAdjuster.cs" />
+    <Content Include="Streams\Graphs\UnzipEnumerable.cs" />
+    <Content Include="ChannelAdjuster\SignalAdjuster.cs" />
+    <Content Include="ChannelAdjuster\ChannelAdjuster.cs" />
+    <Content Include="ChannelAdjuster\SignalAdjusterMessages.cs" />
+    <Content Include="ChannelAdjuster\ChannelAdjusterConfig.cs" />
+    <Content Include="Streams\Graphs\RoundRobinFanIn.cs" />
+    <Content Include="Streams\Graphs\RoundRobinFanOut.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AkkaLibrary.Common\AkkaLibrary.Common.csproj" />
+    <Content Include="Actors\EchoActor.cs" />
+  </ItemGroup>
+</Project>
