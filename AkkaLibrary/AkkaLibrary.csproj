@@ -20,8 +20,6 @@
     <PackageReference Include="Newtonsoft.Json" Version="9.0.1" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="BaseClasses\BaseActor.cs" />
-    <Content Include="Factories\SystemFactory.cs" />
     <Content Include="SingletonActors\PluginDataRegistry.cs" />
     <Content Include="SingletonActors\PluginStatusMonitor.cs" />
     <Content Include="SingletonActors\ServiceDispatcher.cs" />
@@ -42,10 +40,7 @@
     <Content Include="ServiceScaffold\PluginStatusReporterActor.cs" />
     <Content Include="ServiceScaffold\PluginSupervisorActor.cs" />
     <Content Include="ServiceScaffold\DataTopic.cs" />
-    <Content Include="ServiceScaffold\PluginSystem.cs" />
-    <Content Include="ServiceScaffold\PluginSystemFactory.cs" />
     <Content Include="BaseClasses\BasePluginConfiguration.cs" />
-    <Content Include="SystemFactories\SystemFactory.cs" />
     <Content Include="System\PluginSystem.cs" />
     <Content Include="System\Factories\PluginSystemFactory.cs" />
     <Content Include="System\SystemFactory.cs" />
@@ -61,11 +56,7 @@
     <Content Include="FpgaAcquisition\FpgaDelimitingActor.cs" />
     <Content Include="FpgaAcquisition\FpgaConnectionActor.cs" />
     <Content Include="FpgaAcquisition\FpgaChannel.cs" />
-    <Content Include="FpgaConversion\Unit.cs" />
     <Content Include="FpgaConversion\FpgaConversionPluginActor.cs" />
-    <Content Include="FpgaConversion\DataChannel.cs" />
-    <Content Include="FpgaConversion\ChannelData.cs" />
-    <Content Include="BaseClasses\SyncableBase.cs" />
     <Content Include="DataSynchronisation\DataSynchroniserPluginActor.cs" />
     <Content Include="DataSynchronisation\DataSynchroniserMessages.cs" />
     <Content Include="DataSynchronisation\SampleAssembler.cs" />
@@ -74,9 +65,7 @@
     <Content Include="DataSynchronisation\IdentifierExtensions.cs" />
     <Content Include="DataSynchronisation\ExtractionExpressionBuilder.cs" />
     <Content Include="DataSynchronisation\OutputExpressionBuilder.cs" />
-    <Content Include="SignalAdjuster.cs" />
     <Content Include="Streams\Graphs\UnzipEnumerable.cs" />
-    <Content Include="ChannelAdjuster\SignalAdjuster.cs" />
     <Content Include="ChannelAdjuster\ChannelAdjuster.cs" />
     <Content Include="ChannelAdjuster\SignalAdjusterMessages.cs" />
     <Content Include="ChannelAdjuster\ChannelAdjusterConfig.cs" />

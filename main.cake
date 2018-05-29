@@ -20,6 +20,7 @@
 #load .cake/test.cake
 #load .cake/restore.cake
 #load .cake/run.cake
+#load .cake/package.cake
 
 // Default
 Task("Default")

@@ -15,6 +15,7 @@ readonly string BuildDirectory = $"{OutputDirectoryRoot}Build/";
 readonly string TestDirectory = $"{OutputDirectoryRoot}Tests/";
 readonly string TestResultsDirectory = $"{OutputDirectoryRoot}/TestResults/";
 readonly string TestHarnessDirectory = $"{OutputDirectoryRoot}/TestHarness/";
+readonly string ArtifactsDirectory = $"{OutputDirectoryRoot}/Artifacts/";
 public static class TaskDescriptions
 {
     public static readonly string Build = "Build";
@@ -23,4 +24,5 @@ public static class TaskDescriptions
     public static readonly string BuildTest = "BuildTest";
     public static readonly string RunTest = "RunTest";
     public static readonly string Nuget = "Nuget";
+    public static readonly string Package = "Package";
 }
