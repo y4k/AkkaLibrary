@@ -33,6 +33,7 @@ namespace DataSynchronisation.Test
             var source = Source.From(
                 Enumerable
                     .Range(0, 100)
+                    .Select(x => (uint)x)
                     .Select(x => new TimedObject { TachometerCount = x * 50 })
                     );
 
@@ -59,6 +60,7 @@ namespace DataSynchronisation.Test
             var source = Source.From(
                 Enumerable
                     .Range(0, 100)
+                    .Select(x => (uint)x)
                     .Select(x => new TimedObject { TachometerCount = x * 50 })
                     );
 
@@ -86,6 +88,7 @@ namespace DataSynchronisation.Test
                 Enumerable
                     .Range(0, 100)
                     .Select(x => (x % 2 == 0) ? x : x - 1)
+                    .Select(x => (uint)x)
                     .Select(x => new TimedObject { TachometerCount = x * 50})
                     );
 

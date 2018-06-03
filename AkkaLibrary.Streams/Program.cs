@@ -6,6 +6,7 @@ using Akka.Actor;
 using Akka.Configuration;
 using Akka.Streams;
 using Akka.Streams.Dsl;
+using AkkaLibrary.Common.Interfaces;
 using Serilog;
 using Serilog.Core;
 using Serilog.Events;
@@ -33,13 +34,13 @@ namespace DataSynchronisation
                 var loggingActor = system.ActorOf<LoggingActor>("Logger");
 
                 // Create streams.
-                var generator = Source.From<ITimedObject>(GenerateData());
+                var generator = Source.From<ISyncData>(GenerateData());
 
-                var decimator = new SpatialDecimator<ITimedObject>(300, 1);
+                var decimator = new SpatialDecimator<ISyncData>(300, 1);
 
-                var flow = Flow.Create<ITimedObject>().Via(decimator);
+                var flow = Flow.Create<ISyncData>().Via(decimator);
 
-                var sink = Sink.ActorRef<ITimedObject>(loggingActor, PoisonPill.Instance);
+                var sink = Sink.ActorRef<ISyncData>(loggingActor, PoisonPill.Instance);
 
                 var queue = generator.Via(flow).RunWith(sink, materialiser);
 
@@ -54,9 +55,9 @@ namespace DataSynchronisation
             }
         }
 
-        private static IEnumerable<ITimedObject> GenerateData()
+        private static IEnumerable<ISyncData> GenerateData()
         {
-            var tachoCount = 0;
+            uint tachoCount = 0;
             for (int i = 0; i < 100; i++)
             {
                 yield return new TimedObject

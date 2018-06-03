@@ -315,8 +315,69 @@ var buildClusterManager = Task("Build-ClusterManager")
 })
 .IsDependentOn(buildCluster);
 
-// Build and rebuild all aggregated tasks
+var buildAkkaLibraryStreams = Task("Build-AkkaLibrary.Streams")
+.Description("")
+.Does(() =>
+{
+    var name = "AkkaLibrary.Streams";
 
+    Information("Building AkkaLibrary Streams");
+
+    var outputDirectory = $"{BuildDirectory}/{configuration}/{framework}/{runtime}/{name}/";
+
+    var settings = new DotNetCoreBuildSettings
+    {
+        Configuration = configuration,
+        OutputDirectory = outputDirectory,
+        Runtime = runtime,
+        Framework = framework
+    };
+
+    var project = $"{name}/{name}.csproj";
+
+    DotNetCoreClean(project, new DotNetCoreCleanSettings
+    {
+        Framework = framework,
+        Configuration = configuration,
+        OutputDirectory = outputDirectory
+    });
+    CleanDirectory(outputDirectory);
+    DotNetCoreBuild(project, settings);
+})
+.IsDependentOn(buildCommon);
+
+var buildAkkaLibraryStreamsTest = Task("Build-AkkaLibrary.Streams.Test")
+.Description(TaskDescriptions.BuildTest)
+.Does(() =>
+{
+    var name = "AkkaLibrary.Streams.Test";
+
+    var projectFile = $"{name}/{name}.csproj";
+
+    var outputDirectory = $"{TestDirectory}/{configuration}/{framework}/{runtime}/{name}/";
+
+    var settings = new DotNetCoreBuildSettings
+    {
+        Configuration = configuration,
+        OutputDirectory = outputDirectory,
+        Runtime = runtime,
+        Framework = framework
+    };
+
+    Information("Building Akka Library Streams Tests");
+
+    DotNetCoreClean(projectFile, new DotNetCoreCleanSettings
+    {
+        Framework = framework,
+        Configuration = configuration,
+        OutputDirectory = outputDirectory
+    });
+    CleanDirectory(outputDirectory);
+    DotNetCoreBuild(projectFile, settings);
+})
+.IsDependentOn(buildAkkaLibraryStreams);
+
+// Build and rebuild all aggregated tasks
 var buildAllList = new []
 {
     buildCommon,
@@ -329,6 +390,8 @@ var buildAllList = new []
     buildClusterTestHarness,
     buildClusterWorker,
     buildClusterManager,
+    buildAkkaLibraryStreams,
+    buildAkkaLibraryStreamsTest
 };
 
 var buildAll = Task("Build-All")

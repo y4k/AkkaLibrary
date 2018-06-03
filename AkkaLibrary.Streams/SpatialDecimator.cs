@@ -4,6 +4,7 @@ using Akka.Logger.Serilog;
 using Akka.Streams;
 using Akka.Streams.Dsl;
 using Akka.Streams.Stage;
+using AkkaLibrary.Common.Interfaces;
 
 namespace DataSynchronisation
 {
@@ -12,7 +13,7 @@ namespace DataSynchronisation
     /// a set distance
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class SpatialDecimator<T> : GraphStage<FlowShape<T, T>> where T : ITimedObject
+    public class SpatialDecimator<T> : GraphStage<FlowShape<T, T>> where T : ISyncData
     {
         private readonly double _spacingMetres;
         private readonly double _tachosPerMetre;
