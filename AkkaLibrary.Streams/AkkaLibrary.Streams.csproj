@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <Content Include="SpatialDecimator.cs"/>
+    <Content Include="Program.cs"/>
+    <Content Include="MultiSourceSync.cs"/>
+    <Content Include="LoggingActor.cs"/>
+    <Content Include="LoggerFactory.cs"/>
+    <Content Include="ITimedObject.cs"/>
+    <Content Include="TimedBufferFlow.cs"/>
+    <Content Include="TimedObject.cs"/>
+    <Content Include="config.hocon">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Akka" Version="1.3.7"/>
+    <PackageReference Include="Akka.Streams" Version="1.3.7"/>
+    <PackageReference Include="Akka.Logger.Serilog" Version="1.3.6"/>
+    <PackageReference Include="Serilog" Version="2.7.1"/>
+    <PackageReference Include="Akka.Serialization.Hyperion" Version="1.3.7-beta64"/>
+    <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1"/>
+  </ItemGroup>
+</Project>
