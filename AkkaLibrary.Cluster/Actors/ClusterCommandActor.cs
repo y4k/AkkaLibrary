@@ -2,7 +2,7 @@ using System;
 using Akka.Actor;
 using Akka.Cluster.Tools.Singleton;
 using Akka.Event;
-using AkkaLibrary.Common.Utilities;
+using AkkaLibrary.Common.Logging;
 
 namespace AkkaLibrary.Cluster.Actors
 {

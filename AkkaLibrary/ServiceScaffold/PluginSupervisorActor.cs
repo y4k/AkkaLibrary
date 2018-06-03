@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Akka.Actor;
 using Akka.Event;
-using AkkaLibrary.Common.Utilities;
-using AkkaLibrary.ServiceScaffold;
+using AkkaLibrary.Common.Logging;
 
 namespace AkkaLibrary.ServiceScaffold
 {

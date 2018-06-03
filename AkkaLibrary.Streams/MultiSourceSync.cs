@@ -2,7 +2,7 @@ using System;
 using Akka.Streams;
 using Akka.Streams.Stage;
 
-namespace DataSynchronisation
+namespace AkkaLibrary.Streams
 {
     public class MultiSourceSync<T1, T2, TOut> : GraphStage<FanInShape<T1, T2, TOut>>
     {

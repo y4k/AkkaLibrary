@@ -2,9 +2,7 @@ using System.Collections.Generic;
 using System.Net;
 using Akka.Actor;
 using Akka.Event;
-using Akka.IO;
-using Akka.Streams.Dsl;
-using AkkaLibrary.Common.Utilities;
+using AkkaLibrary.Common.Logging;
 
 namespace AkkaLibrary.TcpActors
 {

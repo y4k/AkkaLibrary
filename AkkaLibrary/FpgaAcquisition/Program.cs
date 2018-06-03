@@ -5,6 +5,7 @@ using Akka.Actor;
 using Akka.Configuration;
 using Akka.IO;
 using Akka.Streams;
+using AkkaLibrary.Common.Logging;
 using AkkaLibrary.Common.Objects;
 using Serilog;
 
@@ -16,7 +17,7 @@ namespace AkkaLibrary
         {
             Console.WriteLine("FPGA Acquisition With Akka.");
 
-            Log.Logger = GetLoggerConfiguration();
+            Log.Logger = LoggerFactory.Logger;
 
             var systemConfig = GetSystemConfig();
 
@@ -72,14 +73,6 @@ namespace AkkaLibrary
                     RetryConnectionTimeout = TimeSpan.FromSeconds(3)
                 };
 
-        }
-
-        private static ILogger GetLoggerConfiguration()
-        {
-            return new LoggerConfiguration()
-                        .WriteTo.Console()
-                        .MinimumLevel.Information()
-                        .CreateLogger();
         }
 
         private static Config GetSystemConfig()

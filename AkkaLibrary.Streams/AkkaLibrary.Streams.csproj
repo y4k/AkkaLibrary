@@ -1,13 +1,14 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netcoreapp2.0</TargetFramework>
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <NoWarn>NU1605</NoWarn>
   </PropertyGroup>
   <ItemGroup>
     <Content Include="SpatialDecimator.cs" />
     <Content Include="Program.cs" />
     <Content Include="MultiSourceSync.cs" />
     <Content Include="LoggingActor.cs" />
-    <Content Include="LoggerFactory.cs" />
     <Content Include="ITimedObject.cs" />
     <Content Include="TimedBufferFlow.cs" />
     <Content Include="TimedObject.cs" />

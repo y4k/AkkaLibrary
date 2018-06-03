@@ -4,6 +4,7 @@ using System.Linq;
 using Akka;
 using Akka.Actor;
 using Akka.Event;
+using AkkaLibrary.Common.Logging;
 using AkkaLibrary.Common.Utilities;
 
 namespace AkkaLibrary.ServiceScaffold

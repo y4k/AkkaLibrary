@@ -3,6 +3,7 @@ using System.Threading;
 using Serilog;
 using AkkaLibrary.ServiceScaffold;
 using AkkaLibrary.Common.Configuration;
+using AkkaLibrary.Common.Logging;
 
 namespace TestHarness
 {
@@ -10,9 +11,7 @@ namespace TestHarness
     {
         private static void Run()
         {
-            Log.Logger = new LoggerConfiguration()
-                            .WriteTo.Console(outputTemplate:"[{Level:u3}] [{Timestamp:yyyy-MM-dd HH:mm:ss}] {Message}{NewLine}{Exception}")
-                            .CreateLogger();
+            Log.Logger = LoggerFactory.Logger;
 
             Console.WriteLine("AkkaLibrary Test Harness.");
 

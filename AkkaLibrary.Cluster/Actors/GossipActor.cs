@@ -6,6 +6,7 @@ using Akka;
 using Akka.Actor;
 using Akka.Cluster;
 using Akka.Event;
+using AkkaLibrary.Common.Logging;
 using AkkaLibrary.Common.Utilities;
 
 namespace AkkaLibrary.Cluster.Actors

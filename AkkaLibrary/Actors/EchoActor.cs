@@ -1,5 +1,6 @@
 using System;
 using Akka.Actor;
+using AkkaLibrary.Common.Logging;
 using AkkaLibrary.Common.Utilities;
 
 namespace AkkaLibrary.Actors

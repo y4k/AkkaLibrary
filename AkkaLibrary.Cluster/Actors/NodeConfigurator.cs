@@ -3,11 +3,10 @@ using System.Linq;
 using Akka.Actor;
 using Akka.Configuration;
 using Akka.Event;
-using Akka.Logger.Serilog;
 using AkkaLibrary.Common.Interfaces;
-using AkkaLibrary.Common.Utilities;
 using AkkaLibrary.Cluster.Configuration;
 using AkkaLibrary.Cluster.Interfaces;
+using AkkaLibrary.Common.Logging;
 
 namespace AkkaLibrary.Cluster.Actors
 {

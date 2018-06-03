@@ -8,11 +8,12 @@ using Akka.Configuration;
 using Akka.Streams;
 using Akka.Streams.Dsl;
 using Akka.TestKit.Xunit2;
+using AkkaLibrary.Common.Logging;
 using FluentAssertions;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace DataSynchronisation.Test
+namespace AkkaLibrary.Streams.Test
 {
     public class SpatialDecimatorSpecs : TestKit
     {

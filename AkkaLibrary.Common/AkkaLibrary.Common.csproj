@@ -14,6 +14,8 @@
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="2.0.1" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="2.0.1" />
     <PackageReference Include="Serilog.Sinks.Elasticsearch" Version="6.3.0" />
+  </ItemGroup>
+  <ItemGroup>
     <Content Include="Configuration\ConfigurationFactories.cs" />
     <Content Include="Interfaces\IConfirmable.cs" />
     <Content Include="Configuration\LogLevelEnum.cs" />
@@ -47,5 +49,7 @@
     <Content Include="CustomLogger\SerilogExtendedLoggingAdapter.cs" />
     <Content Include="CustomLogger\SerilogExtendedLoggingAdapterExtensions.cs" />
     <Content Include="Utilities\EnumerableExtensions.cs" />
+    <Content Include="Logging\LoggerFactory.cs" />
+    <Content Include="Logging\LoggingExtensions.cs" />
   </ItemGroup>
 </Project>

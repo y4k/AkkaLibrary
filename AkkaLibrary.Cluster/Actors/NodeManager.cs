@@ -9,6 +9,7 @@ using Akka.Cluster.Tools.PublishSubscribe;
 using Akka.Event;
 using Akka.Logger.Serilog;
 using AkkaLibrary.Common.Interfaces;
+using AkkaLibrary.Common.Logging;
 using AkkaLibrary.Common.Messages;
 using AkkaLibrary.Common.Utilities;
 

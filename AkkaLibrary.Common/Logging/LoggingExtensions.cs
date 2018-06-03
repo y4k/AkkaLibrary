@@ -2,7 +2,7 @@ using Akka.Actor;
 using Akka.Event;
 using Akka.Logger.Serilog;
 
-namespace AkkaLibrary.Common.Utilities
+namespace AkkaLibrary.Common.Logging
 {
     /// <summary>
     /// Logging extensions for the Actor System to add property enrichment.
@@ -19,10 +19,11 @@ namespace AkkaLibrary.Common.Utilities
         /// </summary>
         /// <param name="actorContext"></param>
         /// <returns></returns>
-        public static ILoggingAdapter WithSerilog(this IActorContext actorContext)
-        {
-            return actorContext.GetLogger<SerilogLoggingAdapter>();
-        }
+        // public static ILoggingAdapter WithSerilog(this IActorContext actorContext)
+        // {
+        //     return actorContext.GetLogger<SerilogLoggingAdapter>();
+        // }
+        public static SerilogLoggingAdapter WithSerilog(this IActorContext context) => context.GetLogger<SerilogLoggingAdapter>() as SerilogLoggingAdapter;
 
         #endregion
 
@@ -34,10 +35,14 @@ namespace AkkaLibrary.Common.Utilities
         /// <param name="actorContext">An Actor Context</param>
         /// <param name="identity">Identity string</param>
         /// <returns></returns>
-        public static ILoggingAdapter WithIdentity(this IActorContext actorContext, string identity)
-        {
-            return actorContext.WithSerilog().WithIdentity(identity);
-        }
+        public static SerilogLoggingAdapter WithIdentity(this IActorContext context, string identity) => context.WithSerilog().WithProperty("Identity", identity);
+        // public static ILoggingAdapter WithIdentity(this IActorContext actorContext, string identity)
+        // {
+        //     return actorContext.WithSerilog().WithIdentity(identity);
+        // }
+
+        private static SerilogLoggingAdapter WithProperty(this SerilogLoggingAdapter adapter, string propertyName, object value, bool destructureObjects = false)
+            => adapter.ForContext(propertyName, value, destructureObjects) as SerilogLoggingAdapter;
         
         #endregion
 

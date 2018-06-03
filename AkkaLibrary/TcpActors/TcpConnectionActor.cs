@@ -1,10 +1,8 @@
-using System;
 using System.Net;
-using System.Text;
 using Akka.Actor;
 using Akka.Event;
 using Akka.IO;
-using AkkaLibrary.Common.Utilities;
+using AkkaLibrary.Common.Logging;
 
 namespace AkkaLibrary.TcpActors
 {

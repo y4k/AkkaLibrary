@@ -5,7 +5,7 @@ using Serilog;
 using Serilog.Core;
 using Serilog.Sinks.SystemConsole.Themes;
 
-namespace DataSynchronisation
+namespace AkkaLibrary.Common.Logging
 {
     public class LoggerFactory
     {
@@ -59,15 +59,5 @@ namespace DataSynchronisation
         public static ILogger Logger => Instance._logger;
 
         #endregion
-    }
-
-    public static class LoggerExtensions
-    {
-        public static SerilogLoggingAdapter WithSerilog(this IUntypedActorContext context) => context.GetLogger<SerilogLoggingAdapter>() as SerilogLoggingAdapter;
-
-        public static SerilogLoggingAdapter WithIdentity(this IUntypedActorContext context, string identity) => context.WithSerilog().WithProperty("Identity", identity);
-
-        private static SerilogLoggingAdapter WithProperty(this SerilogLoggingAdapter adapter, string propertyName, object value, bool destructureObjects = false)
-            => adapter.ForContext(propertyName, value, destructureObjects) as SerilogLoggingAdapter;
     }
 }

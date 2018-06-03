@@ -5,6 +5,7 @@ using Akka.Event;
 using Akka.IO;
 using Akka.Streams;
 using Akka.Streams.Dsl;
+using AkkaLibrary.Common.Logging;
 using AkkaLibrary.Common.Utilities;
 
 namespace AkkaLibrary.IOReceiveHandlers

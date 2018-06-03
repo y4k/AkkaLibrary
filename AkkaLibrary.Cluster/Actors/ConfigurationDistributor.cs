@@ -5,6 +5,7 @@ using Akka.Actor;
 using Akka.Event;
 using Akka.Logger.Serilog;
 using AkkaLibrary.Common.Interfaces;
+using AkkaLibrary.Common.Logging;
 using AkkaLibrary.Common.Utilities;
 
 namespace AkkaLibrary.Cluster.Actors

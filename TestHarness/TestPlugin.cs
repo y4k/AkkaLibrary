@@ -1,6 +1,6 @@
 using Akka.Event;
 using AkkaLibrary;
-using AkkaLibrary.Common.Utilities;
+using AkkaLibrary.Common.Logging;
 using AkkaLibrary.ServiceScaffold;
 using System.Collections.Generic;
 

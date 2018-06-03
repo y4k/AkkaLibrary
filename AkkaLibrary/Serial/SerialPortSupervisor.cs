@@ -1,11 +1,8 @@
-using System;
 using System.Collections.Generic;
 using Akka.Actor;
 using Akka.Event;
-using AkkaLibrary.Common.Utilities;
+using AkkaLibrary.Common.Logging;
 using AkkaLibrary.IOReceiveHandlers;
-using NETCoreAsio.DataStructures;
-using NETCoreAsio.Interfaces;
 
 namespace AkkaLibrary.Serial
 {

@@ -2,14 +2,11 @@ using System;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Akka;
-using Akka.IO;
 using Akka.Actor;
 using RJCP.IO.Ports;
-using Serilog;
 using NETCoreAsio.DataStructures;
 using Akka.Event;
-using AkkaLibrary.Common.Utilities;
+using AkkaLibrary.Common.Logging;
 
 namespace AkkaLibrary.Serial
 {

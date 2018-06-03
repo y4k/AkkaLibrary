@@ -6,7 +6,7 @@ using Akka.Streams.Dsl;
 using Akka.Streams.Stage;
 using AkkaLibrary.Common.Interfaces;
 
-namespace DataSynchronisation
+namespace AkkaLibrary.Streams
 {
     /// <summary>
     /// A simple stream decimator that releases elements downstream once they exceeded

@@ -2,8 +2,9 @@ using Akka.Actor;
 using Akka.Event;
 using Akka.Logger.Serilog;
 using AkkaLibrary.Common.Interfaces;
+using AkkaLibrary.Common.Logging;
 
-namespace DataSynchronisation
+namespace TestHarness
 {
     public class LoggingActor : ReceiveActor
     {

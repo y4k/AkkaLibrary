@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Akka.Streams;
 using Akka.Streams.Stage;
 
-namespace DataSynchronisation
+namespace AkkaLibrary.Streams
 {
     public class TimedBufferFlow<T> : GraphStage<FlowShape<T, T>>
     {

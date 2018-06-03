@@ -1,6 +1,6 @@
 using AkkaLibrary.Common.Interfaces;
 
-namespace DataSynchronisation
+namespace AkkaLibrary.Streams
 {
     public class TimedObject : ISyncData
     {
