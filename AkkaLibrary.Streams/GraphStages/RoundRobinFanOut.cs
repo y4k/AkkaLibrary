@@ -4,7 +4,7 @@ using Akka.Streams;
 using Akka.Streams.Stage;
 using Akka.Util.Internal;
 
-namespace AkkaLibrary.Streams.Graphs
+namespace AkkaLibrary.Streams.GraphStages
 {
     public class RoundRobinFanOut<T> : GraphStage<UniformFanOutShape<T, T>>
     {

@@ -7,13 +7,13 @@ using Akka.Streams;
 using Akka.Streams.Dsl;
 using Akka.TestKit.Xunit2;
 using AkkaLibrary.Streams;
-using AkkaLibrary.Streams.Graphs;
+using AkkaLibrary.Streams.GraphStages;
 using FluentAssertions;
 using FsCheck;
 using FsCheck.Xunit;
 using Xunit;
 
-namespace AkkaLibrary.Test.Streams
+namespace AkkaLibrary.Streams.Test
 {
     public class UnzipEnumerableSpecs : TestKit
     {

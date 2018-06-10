@@ -5,7 +5,7 @@ using Akka.Streams;
 using Akka.Streams.Stage;
 using Akka.Util.Internal;
 
-namespace AkkaLibrary.Streams.Graphs
+namespace AkkaLibrary.Streams.GraphStages
 {
     /// <summary>
     /// Fan out graph stage that splits a stream of enumerables, each of length n,

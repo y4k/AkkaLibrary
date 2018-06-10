@@ -91,7 +91,6 @@ namespace AkkaLibrary.DataSynchronisation
 
                 var equality = Expression.Equal(whereParam, whereValue);
 
-
                 var select = Expression.Call(
                             typeof(Enumerable),
                             "Where",

@@ -4,7 +4,7 @@ using System.Collections.Immutable;
 using Akka.Streams;
 using Akka.Streams.Stage;
 
-namespace AkkaLibrary.Streams.Graphs
+namespace AkkaLibrary.Streams.GraphStages
 {
     public class RoundRobinFanIn<T> : GraphStage<UniformFanInShape<T, T>>
     {

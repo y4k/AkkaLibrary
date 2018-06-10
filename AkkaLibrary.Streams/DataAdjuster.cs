@@ -2,96 +2,72 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using Akka;
 using Akka.Actor;
 using Akka.Streams;
 using Akka.Streams.Dsl;
-using Akka.Util.Internal;
 using AkkaLibrary.Common.Interfaces;
 using AkkaLibrary.Common.Objects;
 using AkkaLibrary.Streams.GraphStages;
-using Serilog;
 
-namespace AkkaLibrary
+namespace AkkaLibrary.Streams
 {
-    public class ChannelAdjuster : ReceiveActor, IWithUnboundedStash
+    public class ChannelAdjusterConfig
     {
-        private ISourceQueueWithComplete<ChannelData<float>> _queue;
-        private int _samplesEnqueued;
-        private int _samplesDropped;
-        private IEnumerable<ChannelAdjusterConfig> _configs;
+        public string Name { get; }
 
-        public IStash Stash { get ; set; }
+        public float Scale { get; }
 
-        public ChannelAdjuster(IEnumerable<ChannelAdjusterConfig> configs, IActorRef target)
+        public float Offset { get; }
+
+        public FilterOption Option { get; }
+
+        public int TemporalOffset { get; }
+
+        public ChannelAdjusterConfig(string name, float scale, float offset, int temporalOffset, FilterOption option)
         {
-            _configs = configs;
-            
-            /* Receives the first sample and creates the graph. Starts the graph and
-               transitions to running state and passes the sample back in as the
-               first message.
-             */
-            Receive<ChannelData<float>>(sample =>
-            {
-                //Create the graph from the first sample and then become working.
-                Stash.Stash();
-                var runnableGraph = CreateGraph(target, _configs.ToList(), sample);
-                _queue = runnableGraph.Run(Context.Materializer());
-                Become(Working);
-            });
+            Name = name;
+            Scale = scale;
+            Offset = offset;
+            Option = option;
+            TemporalOffset = temporalOffset;
         }
+    }
 
-        public static Props GetProps(
-                        IEnumerable<ChannelAdjusterConfig> adjustedChannels,
-                        IActorRef target)
-                        => Props.Create(
-                            () => new ChannelAdjuster(adjustedChannels, target)
-                            );
+    public enum FilterOption
+    {
+        NotSet,
+        PassThrough,
+        CreateDigitals,
+        Filter
+    }
 
-        private void Working()
-        {
-            Receive<ChannelData<float>>(msg =>
-            {
-                _queue.OfferAsync(msg).PipeTo(Self);
-            });
-
-            Receive<IQueueOfferResult>(enqueueTask =>
-            {
-                enqueueTask.Match()
-                        .With<QueueOfferResult.Enqueued>(msg => ++_samplesEnqueued)
-                        .With<QueueOfferResult.Dropped>(msg => Log.Warning("Signal Adjuster dropped a sample. Total dropped:{0}", ++_samplesDropped))
-                        .With<QueueOfferResult.Failure>(msg => throw msg.Cause)
-                        .With<QueueOfferResult.QueueClosed>(msg => throw new Exception("The stream queue was closed."));
-            });
-
-            Stash.UnstashAll();
-        }
-
-        private IEnumerable<int> GetIndices(ChannelData<float> sample, IEnumerable<ChannelAdjusterConfig> configs)
+    public static class DataAdjusterFactory
+    {
+        private static IEnumerable<int> GetIndices(ChannelData<float> sample, IEnumerable<ChannelAdjusterConfig> configs)
         {
             return configs.Select(cfg => sample.Analogs.Select((x, i) => (index: i, data: x)).First(pair => pair.data.Name == cfg.Name).index);
         }
 
-        private RunnableGraph<ISourceQueueWithComplete<ChannelData<float>>> CreateGraph(IActorRef target, List<ChannelAdjusterConfig> configs, ChannelData<float> sample)
+        private static RunnableGraph<ISourceQueueWithComplete<ChannelData<float>>> CreateGraph(IActorRef target, List<ChannelAdjusterConfig> configs, ChannelData<float> sample)
         {
             /*
-            Digital Merger is only necessary when there are additional digitals created and the same goes for the
-            Broadcast following the Analog Splitter. A broadcast is only required when the analog channel is produces
-            the additional digitals. Otherwise the analog is pushed straight to the merger
-            +---------------+--------------+-----------------------------------------------------------------------+
-            |               |              |                     SyncData                           |              |
-            |               |              +-------------+----------------+-------------------------+              |
-            |  QueueSource  | Channel Data |             |    FilterFlow           |                | Channel Data |
-            |               |    Splitter  |    Analog   |  ================       |     Analog     |              |
-            |               |              |   Splitter  |  Broadcast => Filter    |     Merger     |              |
-            |               |              |             |         ----------------+----------------+              |
-            |               |              |             |         \=> -FullScale  |                |              |
-            |               |              |             |         \=> +FullScale  |    Digital     |              |
-            |               |              |             |         \=> FlatLining  |     Merger     |              |
-            |               |              +-------------+-------------------------+                |              |
-            |               |              |    Digitals                           |                |              |
-            +---------------+--------------+-----------------------------------------------------------------------+
-            */
+                Digital Merger is only necessary when there are additional digitals created and the same goes for the
+                Broadcast following the Analog Splitter. A broadcast is only required when the analog channel is produces
+                the additional digitals. Otherwise the analog is pushed straight to the merger
+                +---------------+--------------+-----------------------------------------------------------------------+
+                |               |              |                     SyncData                           |              |
+                |               |              +-------------+----------------+-------------------------+              |
+                |  QueueSource  | Channel Data |             |    FilterFlow           |                | Channel Data |
+                |               |    Splitter  |    Analog   |  ================       |     Analog     |              |
+                |               |              |   Splitter  |  Broadcast => Filter    |     Merger     |              |
+                |               |              |             |         ----------------+----------------+              |
+                |               |              |             |         \=> -FullScale  |                |              |
+                |               |              |             |         \=> +FullScale  |    Digital     |              |
+                |               |              |             |         \=> FlatLining  |     Merger     |              |
+                |               |              +-------------+-------------------------+                |              |
+                |               |              |    Digitals                           |                |              |
+                +---------------+--------------+-----------------------------------------------------------------------+
+                */
 
             var indices = GetIndices(sample, configs);
             var number = indices.Count();
@@ -101,7 +77,7 @@ namespace AkkaLibrary
             var temp = temporalOffsets.Select(x => x - temporalOffsets.Min()).ToList();
             var skipIndices = temp.Take(temp.Count - 1).ToList();
             var zerothIndex = temp.Last();
-            
+
 
 
             var bufferSize = temp.Max() + 1;
@@ -142,7 +118,7 @@ namespace AkkaLibrary
                     {
                         // 1a) Each cfg generates one analog flow...
                         case FilterOption.PassThrough:
-                            if(skipFlowsNeeded)
+                            if (skipFlowsNeeded)
                             {
                                 builder.From(analogSplitterShape.Out(i))
                                        .Via(
@@ -166,7 +142,7 @@ namespace AkkaLibrary
                             var scale = configs[i].Scale;
                             var offset = configs[i].Offset;
 
-                            var filterFlow = skipFlowsNeeded?
+                            var filterFlow = skipFlowsNeeded ?
                                                 Flow.Create<DataChannel<float>>()
                                                     .Buffer(bufferSize, OverflowStrategy.Backpressure)
                                                     .Skip(skipValue)
@@ -252,7 +228,7 @@ namespace AkkaLibrary
 
                 //=====Source=====
                 //Source to the channel data splitter
-                if(skipFlowsNeeded)
+                if (skipFlowsNeeded)
                 {
                     builder.From(source)
                            .Via(builder.Add(Flow.Create<ChannelData<float>>().Buffer(bufferSize, OverflowStrategy.Backpressure)))

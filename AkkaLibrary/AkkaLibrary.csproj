@@ -76,4 +76,7 @@
     <ProjectReference Include="..\AkkaLibrary.Common\AkkaLibrary.Common.csproj" />
     <Content Include="Actors\EchoActor.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AkkaLibrary.Streams\AkkaLibrary.Streams.csproj" />
+  </ItemGroup>
 </Project>
