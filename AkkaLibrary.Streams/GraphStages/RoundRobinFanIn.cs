@@ -12,39 +12,39 @@ namespace AkkaLibrary.Streams.GraphStages
 
         private sealed class Logic : OutGraphStageLogic
         {
-            private readonly RoundRobinFanIn<T> _stage;
+            private readonly RoundRobinFanIn<T> _source;
             private readonly IEnumerator<Inlet<T>> _inletEnumerator;
             private int _upstreamRunning;
             private Inlet<T> _currentInlet => _inletEnumerator.Current;
             private Inlet<T> NextInlet()
             {
-                    if(!_inletEnumerator.MoveNext())
-                    {
-                        _inletEnumerator.Reset();
-                        _inletEnumerator.MoveNext();
-                    }
+                if(!_inletEnumerator.MoveNext())
+                {
+                    _inletEnumerator.Reset();
+                    _inletEnumerator.MoveNext();
+                }
 
-                    return _currentInlet;
+                return _currentInlet;
             }
 
-            public Logic(RoundRobinFanIn<T> stage) : base(stage.Shape)
+            public Logic(RoundRobinFanIn<T> source) : base(source.Shape)
             {
                 // Copy of the stage
-                _stage = stage;
+                _source = source;
 
                 // Count of upstream running stages
-                _upstreamRunning = _stage._n;
+                _upstreamRunning = _source._n;
 
                 // Enumerator over all the inlets
-                _inletEnumerator = _stage.Inlets.GetEnumerator();
+                _inletEnumerator = _source.Inlets.GetEnumerator();
 
                 // Set the current inlet by moving next once
                 _inletEnumerator.MoveNext();
 
                 // Outlet handler
-                SetHandler(_stage.Out, this);
+                SetHandler(_source.Out, this);
 
-                foreach (var inlet in _stage.Inlets)
+                foreach (var inlet in _source.Inlets)
                 {
                     SetHandler(inlet,
                     onPush:() =>
@@ -53,10 +53,10 @@ namespace AkkaLibrary.Streams.GraphStages
 
                         // If the inlet is the current inlet and the outlet is
                         // available to be pushed, grab the element and push it.
-                        if(inlet == _currentInlet && IsAvailable(_stage.Out))
+                        if(inlet == _currentInlet && IsAvailable(_source.Out))
                         {
                             var element = Grab(inlet);
-                            Push(_stage.Out, element);
+                            Push(_source.Out, element);
 
                             // move the iterator to the next
                             NextInlet();
@@ -90,7 +90,7 @@ namespace AkkaLibrary.Streams.GraphStages
                 }
                 
                 // If the current inlet is closed then move to the next
-                while((IsClosed(_currentInlet)))
+                while(IsClosed(_currentInlet))
                 {
                     NextInlet();
                 }
@@ -103,7 +103,7 @@ namespace AkkaLibrary.Streams.GraphStages
                     var element = Grab(_currentInlet);
 
                     // then push it to the outlet.
-                    Push(_stage.Out, element);
+                    Push(_source.Out, element);
 
                     NextInlet();
                 }

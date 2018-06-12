@@ -22,5 +22,7 @@
     <ProjectReference Include="..\AkkaLibrary.Common\AkkaLibrary.Common.csproj" />
     <Content Include="RoundRobinSpecs.cs" />
     <Content Include="UnzipEnumerableSpecs.cs" />
+    <Content Include="MergeStreamSpecs.cs" />
+    <Content Include="MergeStageSpecs.cs" />
   </ItemGroup>
 </Project>

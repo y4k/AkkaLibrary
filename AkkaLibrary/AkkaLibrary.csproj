@@ -78,5 +78,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AkkaLibrary.Streams\AkkaLibrary.Streams.csproj" />
+    <Content Include="Exceedances\ExceedanceMangager.cs" />
+    <Content Include="Exceedances\ExceedanceConfiguration.cs" />
   </ItemGroup>
 </Project>

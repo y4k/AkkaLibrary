@@ -31,5 +31,7 @@
     <Content Include="GraphStages\UnzipEnumerable.cs" />
     <Content Include="GraphStages\RoundRobinFanIn.cs" />
     <Content Include="GraphStages\RoundRobinFanOut.cs" />
+    <Content Include="MergeN.cs" />
+    <Content Include="GraphStages\MergeN.cs" />
   </ItemGroup>
 </Project>
