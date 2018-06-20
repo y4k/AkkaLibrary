@@ -5,14 +5,19 @@ using System.Linq;
 using Akka.Streams;
 using Akka.Streams.Stage;
 using AkkaLibrary.Common.Interfaces;
+using NETCoreAsio.DataStructures;
 
 namespace AkkaLibrary.Streams.GraphStages
 {
-    public class MergeN<TIn> : GraphStage<UniformFanInShape<TIn, IImmutableList<TIn>>> where TIn : ISyncData
+    /// <summary>
+    /// Synchronises a number of input streams into a single output based on timestamp
+    /// </summary>
+    /// <typeparam name="TIn"></typeparam>
+    public class MergeClosestN<TIn> : GraphStage<UniformFanInShape<TIn, IImmutableList<TIn>>> where TIn : class, ISyncData
     {
         private readonly int _n;
 
-        public MergeN(int n)
+        public MergeClosestN(int n)
         {
             if(n < 2)
             {
@@ -48,104 +53,102 @@ namespace AkkaLibrary.Streams.GraphStages
 
         private sealed class Logic : OutGraphStageLogic
         {
-            private readonly MergeN<TIn> _source;
+            private readonly MergeClosestN<TIn> _source;
             private int _n;
-            private ImmutableList<TIn> _element;
-            private readonly Queue<TIn> _primaryArray;
-            private readonly Queue<TIn>[] _secondaryArrays;
-            private readonly Inlet<TIn> _primary;
-            private readonly IImmutableList<Inlet<TIn>> _secondaries;
+            private Queue<ImmutableList<TIn>> _outputQueue;
+            private readonly CircularQueue<TIn> _primaryQueue;
+            private readonly Dictionary<Inlet<TIn>, CircularQueue<TIn>> _secondaryQueues;
+            private readonly Dictionary<Inlet<TIn>, bool> _canTryMerge;
+            private readonly Inlet<TIn> _primaryInlet;
+            private readonly IImmutableList<Inlet<TIn>> _secondaryInlets;
             private readonly Outlet<IImmutableList<TIn>> _outlet;
 
-            public Logic(MergeN<TIn> source) : base(source.Shape)
+            public Logic(MergeClosestN<TIn> source) : base(source.Shape)
             {
                 _source = source;
                 _n = _source._n;
-                var upstreamToPull = new bool[_source._n];
-                _primary = _source.PrimaryInlet;
-                _secondaries = _source.SecondaryInlets;
+                _primaryInlet = _source.PrimaryInlet;
+                _secondaryInlets = _source.SecondaryInlets;
                 _outlet = _source.Out;
 
+
+                _outputQueue = new Queue<ImmutableList<TIn>>();
+                _primaryQueue = new CircularQueue<TIn>(2, true);
+                _secondaryQueues = _secondaryInlets
+                                    .Select(x => (key: x, value: new CircularQueue<TIn>(2, true)))
+                                    .ToDictionary(x => x.key, x => x.value);
+
+                _canTryMerge = new[] { _primaryInlet }.Concat(_secondaryInlets)
+                            .Select(x => (key: x, value: false))
+                            .ToDictionary(x => x.key, x => x.value);
+
+                // Set the output handler
                 SetHandler(_source.Out, this);
 
-                _primaryArray = new Queue<TIn>();
-                _secondaryArrays = Enumerable.Range(0,_n - 1).Select(x => new Queue<TIn>()).ToArray();
-
+                // Set the handler for the primary input stream
                 SetHandler(
-                    _primary,
-                    onPush:() =>
+                    _primaryInlet,
+                    // When an element is ready from the upstream
+                    onPush: () =>
                     {
-                        var element = Grab(_primary);
-                        _primaryArray.Enqueue(element);
-                        while(_primaryArray.Count > 2)
+                        // Get and enqueue the element
+                        var element = Grab(_primaryInlet);
+                            _primaryQueue.Enqueue(element);
+
+                        // Fill the primary queue while empty
+                        if (_primaryQueue.Count < 2)
                         {
-                            _primaryArray.Dequeue();
+                            Pull(_primaryInlet);
+                            _canTryMerge[_primaryInlet] = false;
+                            return;
                         }
 
-                        // Fill the primary queue while less than 2
-                        if(_primaryArray.Count < 2)
+                        // Drop items until only 2 in the queue
+                        while (_primaryQueue.Count > 2)
                         {
-                            Pull(_primary);
+                            Log.Warning("{Number} items in {PrimaryQueue}. Expects 2 at most", _primaryInlet.Name, _primaryQueue.Count);
+                            _primaryQueue.Dequeue();
                         }
-                        // Check if merging is possible...
-                        else if(CanMerge)
-                        {
-                            TryMerge();
-                        }
-                        // Otherwise fill the secondary queues
-                        else
-                        {
-                            foreach (var inlet in _secondaries)
-                            {
-                                Pull(inlet);
-                            }
-                        }
+                        _canTryMerge[_primaryInlet] = true;
+
+                        TryMerge();
                     },
-                    onUpstreamFinish:() =>
+                    onUpstreamFinish: () =>
                     {
                         // Close the stage as soon as the primary stream is finished
                         CompleteStage();
                     });
 
-                foreach (var (inlet, queue) in _secondaries.Zip(_secondaryArrays, (x,y) => (x,y)))
+                // Set the handlers for the secondary streams
+                foreach (var (inlet, queue) in _secondaryQueues)
                 {
                     SetHandler(
                         inlet,
-                        onPush:() =>
+                        onPush: () =>
                         {
+                            // Get and enqueue the element
                             var element = Grab(inlet);
                             queue.Enqueue(element);
-                            while(queue.Count > 2)
-                            {
-                                queue.Dequeue();
-                            }
 
-                            /*
-                             Drop item from head of queue if seconday timestamp is less
-                             than that of the primary head
-                             */
-                            if(queue.Peek().TimeStamp < _primaryArray.Peek().TimeStamp)
-                            {
-                                queue.Dequeue();
-                                // Check second item as well
-                                if(queue.Peek().TimeStamp < _primaryArray.Peek().TimeStamp)
-                                {
-                                    queue.Dequeue();
-                                }
-                            }
-
-                            // If there are not two items in the queue, pull
-                            if(queue.Count < 2)
+                            // Fill the queue if there are not two items OR
+                            // after dropping unsyncable items
+                            if (queue.Count < 2 || DropUnsyncableSecondaryItems(_primaryQueue.Head().TimeStamp, queue))
                             {
                                 // Demand an item from the inlet.
                                 Pull(inlet);
+                                return;
                             }
-                            else if(CanMerge)
+
+                            while (queue.Count > 2)
                             {
-                                TryMerge();
+                                Log.Warning("{Number} items in {SecondaryQueue}. Expects 2 at most", inlet.Name, queue.Count);
+                                queue.Dequeue();
                             }
+                            _canTryMerge[inlet] = true;
+                            
+                            TryMerge();
                         },
-                        onUpstreamFinish:() =>
+                        onUpstreamFinish: () =>
                         {
                             // Close the stage as soon as the stream is finished
                             CompleteStage();
@@ -153,54 +156,210 @@ namespace AkkaLibrary.Streams.GraphStages
                 }
             }
 
-            private bool CanMerge
-                => _primaryArray.Count >= 2 && _secondaryArrays.All(x => x.Count >= 2);
+            /// <summary>
+            /// When the downstream stage requests an element
+            /// </summary>
+            public override void OnPull()
+            {
+                // If there is an element that has been merged to push...
+                if (_outputQueue.TryDequeue(out var element))
+                {
+                    // ...push out the new element
+                    Push(_source.Out, element);
+                }
+
+                // Fill the primary queue if necessary
+                if (_primaryQueue.Count < 2 && !HasBeenPulled(_primaryInlet))
+                {
+                    Pull(_primaryInlet);
+                    _canTryMerge[_primaryInlet] = false;
+                }
+                else
+                {
+                    _canTryMerge[_primaryInlet] = true;
+                }
+
+                // Even if the primary required pulling, if it had at least one item in
+                // it, then we can drop unsyncable items
+                var canDrop = _primaryQueue.Count > 0;
+                foreach (var (inlet, queue) in _secondaryQueues)
+                {
+                    // If there is at least 1 primary...
+                    if (canDrop)
+                    {
+                        // ...drop secondary items too far ahead...
+                        DropUnsyncableSecondaryItems(_primaryQueue.Head().TimeStamp, queue);
+                    }
+                    // Refill the secondary queue as necessary
+                    if (queue.Count < 2 && !HasBeenPulled(inlet))
+                    {
+                        Pull(inlet);
+                        _canTryMerge[_primaryInlet] = false;
+                    }
+                    else
+                    {
+                        _canTryMerge[_primaryInlet] = true;
+                    }
+                }
+
+                TryMerge();
+            }
+
+            /// <summary>
+            /// Removes items from the secondary queues that cannot possibly be
+            /// synced with the primary
+            /// </summary>
+            /// <returns>
+            /// true if any items are dropped, otherwise false
+            /// </returns>
+            private bool DropUnsyncableSecondaryItems(long primaryTimestamp, CircularQueue<TIn> queue)
+            {
+                // There can only be a single item ahead of the primary in time.
+                if (queue.Count > 1)
+                {
+                    // If the second item in the queue is ahead of or level with the primary...
+                    if (queue.Second().TimeStamp <= primaryTimestamp)
+                    {
+                        // ...drop the head of the secondary queue.
+                        queue.Drop(1);
+                        return true;
+                    }
+                }
+                return false;
+            }
 
             private void TryMerge()
             {
-                // Try and merge items from the primary and secondary queues
-                var output
-                    = ImmutableList.CreateRange(
-                            new[] { _primaryArray.Dequeue() }
-                            .Concat(
-                                _secondaryArrays.Select(x => x.Dequeue()))
-                                );
-                // If there is demand from the outlet
-                if(IsAvailable(_outlet))
+                if(_canTryMerge.Values.Any(x => x == false))
                 {
-                    Push(
-                        _outlet,
-                        output
-                        );
+                    return;
                 }
-                else
-                {
-                    _element = output;
-                }
-            }
+                
+                var ph = _primaryQueue.Head().TimeStamp;
+                var pt = _primaryQueue.Second().TimeStamp;
 
-            public override void OnPull()
-            {
-                // Can only push an element out if it has been merged.
-                if(ElementAvailable(out var element))
+                var canMerge = true;
+                foreach (var (inlet, queue) in _secondaryQueues)
                 {
-                    // Push out the new element
-                    Push(_source.Out, element);
-                    _element = null;
-                }
-                else
-                {
-                    Pull(_primary);
-                }
-            }
+                    var sh = queue.Head().TimeStamp;
+                    var st = queue.Second().TimeStamp;
 
-            private bool ElementAvailable(out IImmutableList<TIn> element)
-            {
-                element = _element;
-                return _element != null;
+                    // S5 - If the secondary head is behind the primary tail, drop the primary head.
+                    if( sh >= pt )
+                    {
+                        // Drop the primary head
+                        _primaryQueue.Drop(1);
+                        // Pull a new primary
+                        if(!HasBeenPulled(_primaryInlet))
+                        {
+                            Pull(_primaryInlet);
+                        }
+                        // Once the primary has been dropped, can no longer merge.
+                        canMerge = false;
+                    }
+                    // S2
+                    else if( st <= ph )
+                    {
+                        // Drop the secondary head and pull a new element
+                        queue.Drop(1);
+                        if(!HasBeenPulled(inlet))
+                        {
+                            Pull(inlet);
+                        }
+                        canMerge = false;
+                    }
+                    // S3 and 4
+                    else if( ph < sh )
+                    {
+                        if( st <= pt)
+                        {
+                            // Sync primary head with secondary head
+                            queue.Drop(1);
+                        }
+                        else
+                        {
+                            if( (ph - st) >= (pt - st) )
+                            {
+                                // Sync with primary head and secondary head
+                            }
+                            else
+                            {
+                                // Drop the primary head and stop syncing
+                                _primaryQueue.Drop(1);
+                                if(!HasBeenPulled(_primaryInlet))
+                                {
+                                    Pull(_primaryInlet);
+                                }
+                                // Once the primary has been dropped, can no longer merge.
+                                canMerge = false;
+                            }
+                        }
+                    }
+                    // S1
+                    else if(sh <= ph && st > ph)
+                    {
+                        if(st >= pt)
+                        {
+                            // Sync the primary head with the secondary head
+                        }
+                        else if( (sh - ph) <= (st - ph) )
+                        {
+                            // Sync the primary head with the secondary head
+                        }
+                        else if( (st - ph) >= ( st - pt) )
+                        {
+                            // Sync the primary head with secondary head
+                        }
+                        else
+                        {
+                            canMerge = false;
+                        }
+                    }
+                }
+
+                if(canMerge)
+                {
+                    // Sync primary head with the secondary items
+                    _outputQueue.Enqueue(
+                        new List<TIn>
+                        {
+                            _primaryQueue.Dequeue()
+                        }.Concat(_secondaryQueues.Values.Select(x => x.Dequeue())).ToImmutableList()
+                    );
+
+                    if(IsAvailable(_outlet))
+                    {
+                        Push(_outlet, _outputQueue.Dequeue());
+                    }
+                }
+                else if(_primaryQueue.Count < 2)
+                {
+                    foreach (var queue in _secondaryQueues.Values)
+                    {
+                        DropUnsyncableSecondaryItems(_primaryQueue.Head().TimeStamp, queue);
+                    }
+                }
+
+                _canTryMerge[_primaryInlet] = _primaryQueue.Count == 2;
+                foreach (var key in _canTryMerge.Keys.Where(_secondaryQueues.Keys.Contains).ToList())
+                {
+                    _canTryMerge[key] = _secondaryQueues[key].Count == 2;
+                }
             }
         }
-
         #endregion
+    }
+
+    public static class CircularQueueExtensions
+    {
+        public static T Head<T>(this CircularQueue<T> queue)
+        {
+            return queue[0];
+        }
+
+        public static T Second<T>(this CircularQueue<T> queue)
+        {
+            return queue[1];
+        }
     }
 }
