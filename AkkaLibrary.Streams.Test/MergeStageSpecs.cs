@@ -14,7 +14,7 @@ using Xunit;
 
 namespace AkkaLibrary.Streams.Test
 {
-    public class MergeStageTwoStreamSpecs : TestKit
+    public class MergeStageSpecs : TestKit
     {
         [Fact]
         public void ExactSampleMerge()
@@ -160,6 +160,55 @@ namespace AkkaLibrary.Streams.Test
 
                 var sampleIndices = arrays.Select(x => x.Select(y => y.SampleIndex).ToArray()).ToList();
                 sampleIndices.Should().BeEquivalentTo(Enumerable.Range(0,99).Select(x => new[]{100 + x, x}));
+            }
+        }
+
+        [Fact]
+        public void ExactSampleFiveStreamMerge()
+        {
+            using (var mat = Sys.Materializer())
+            {
+                var probe = CreateTestProbe();
+
+                var graph = RunnableGraph.FromGraph(
+                    GraphDsl.Create(builder =>
+                    {
+                        var sources = Enumerable.Range(0, 5).Select(x =>
+                            Source.From(
+                                Enumerable.Range(0,100)
+                                .Select(y => Mock.Of<ISyncData>(m =>
+                                m.TimeStamp == 100 * y
+                                && m.SampleIndex == y
+                                )))).ToArray();
+
+                        var merger = builder.Add(new MergeClosestN<ISyncData>(5));
+
+                        var sink = Sink.ActorRef<IImmutableList<ISyncData>>(probe, "completed");
+
+                        for (int i = 0; i < 5; i++)
+                        {
+                            builder.From(sources[i]).To(merger.In(i));
+                        }
+                        builder.From(merger.Out).To(sink);
+
+                        return ClosedShape.Instance;
+                    }));
+
+                graph.Run(mat);
+
+                var msgs = probe.ReceiveN(99, TimeSpan.FromSeconds(Debugger.IsAttached ? 300 : 3));
+                msgs.Should().AllBeAssignableTo(typeof(IImmutableList<ISyncData>));
+
+                var arrays = msgs.Cast<IImmutableList<ISyncData>>().ToList();
+                var timestamps = arrays.Select(x => x.Select(y => y.TimeStamp).ToArray()).ToList();
+                timestamps.Should().BeEquivalentTo(
+                    Enumerable.Range(0, 99).Select(x => 
+                    Enumerable.Range(0,5).Select(y => x * 100).ToArray()));
+
+                var sampleIndices = arrays.Select(x => x.Select(y => y.SampleIndex).ToArray()).ToList();
+                sampleIndices.Should().BeEquivalentTo(
+                    Enumerable.Range(0,99).Select(x => 
+                    Enumerable.Range(0,5).Select(y => x).ToArray()));
             }
         }
     }
