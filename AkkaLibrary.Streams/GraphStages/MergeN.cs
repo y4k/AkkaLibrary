@@ -244,23 +244,23 @@ namespace AkkaLibrary.Streams.GraphStages
                     var sh = queue.Head().TimeStamp;
                     var st = queue.Second().TimeStamp;
 
-                    // S5 - If the secondary head is behind the primary tail, drop the primary head.
+                    // S5 - If the secondary head is behind the primary tail...
                     if( sh >= pt )
                     {
-                        // Drop the primary head
+                        // ...drop the primary head
                         _primaryQueue.Drop(1);
                         // Pull a new primary
                         if(!HasBeenPulled(_primaryInlet))
                         {
                             Pull(_primaryInlet);
                         }
-                        // Once the primary has been dropped, can no longer merge.
+                        // Once the primary has been dropped, can no longer merge
                         canMerge = false;
                     }
-                    // S2
+                    // S2 - If the secondary head and tail are before the primary...
                     else if( st <= ph )
                     {
-                        // Drop the secondary head and pull a new element
+                        // ...drop the secondary head and pull a new element
                         queue.Drop(1);
                         if(!HasBeenPulled(inlet))
                         {
@@ -268,47 +268,79 @@ namespace AkkaLibrary.Streams.GraphStages
                         }
                         canMerge = false;
                     }
-                    // S3 and 4
+                    // S3 and 4 - If the secondary head and tail are after the primary head...
                     else if( ph < sh )
                     {
+                        // S3 - If the secondary tail is before the primary tail...
                         if( st <= pt)
                         {
-                            // Sync primary head with secondary head
-                            queue.Drop(1);
+                            // ...sync primary head with secondary head
                         }
+                        // S4 - ...otherwise...
                         else
                         {
-                            if( (ph - st) >= (pt - st) )
+                            // If the secondary head is closer to the primary head than the primary tail...
+                            if( (sh - ph) <= (pt - sh) )
                             {
-                                // Sync with primary head and secondary head
+                                // ...sync with primary head and secondary head
                             }
-                            else
+                            // If the primary tail is closer to the secondary head than the secondary tail...
+                            else if( (pt - sh) <= (st - pt) )
                             {
-                                // Drop the primary head and stop syncing
+                                // ...sync with primary tail and secondary head...
+                                // Drop the primary head...
                                 _primaryQueue.Drop(1);
                                 if(!HasBeenPulled(_primaryInlet))
                                 {
                                     Pull(_primaryInlet);
                                 }
-                                // Once the primary has been dropped, can no longer merge.
+                                // ...and stop syncing. Once the primary has been dropped, can no longer merge.
+                                canMerge = false;
+                            }
+                            else
+                            {
+                                // Drop the primary head...
+                                _primaryQueue.Drop(1);
+                                if(!HasBeenPulled(_primaryInlet))
+                                {
+                                    Pull(_primaryInlet);
+                                }
+                                // ...and the secondary head...
+                                queue.Drop(1);
+                                if(!HasBeenPulled(inlet))
+                                {
+                                    Pull(inlet);
+                                }
+                                // ...and stop syncing. Once the primary has been dropped, can no longer merge.
                                 canMerge = false;
                             }
                         }
                     }
-                    // S1
+                    // S1 - Secondary head is before the primary head and secondary tail
+                    // is after the primary head
                     else if(sh <= ph && st > ph)
                     {
+                        // If the secondary tail is after the primary tail...
                         if(st >= pt)
                         {
-                            // Sync the primary head with the secondary head
+                            // ...sync the primary head with the secondary head
                         }
-                        else if( (sh - ph) <= (st - ph) )
+                        // If the primary head is closer to secondary head than the secondary tail...
+                        else if( (ph - sh) <= (st - ph) )
                         {
-                            // Sync the primary head with the secondary head
+                            // ...sync the primary head with the secondary head
                         }
+                        // If the secondary tail is closer to primary tail than the primary head...
                         else if( (st - ph) >= ( st - pt) )
                         {
-                            // Sync the primary head with secondary head
+                            // Drop the secondary head but still sync...
+                            queue.Drop(1);
+                            // ...sync the primary head with secondary tail...
+                            // ...also pull another item
+                            if(!HasBeenPulled(inlet))
+                            {
+                                Pull(inlet);
+                            }
                         }
                         else
                         {
