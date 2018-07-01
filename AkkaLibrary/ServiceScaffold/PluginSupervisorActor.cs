@@ -65,8 +65,8 @@ namespace AkkaLibrary.ServiceScaffold
 
             Receive<PluginSupervisorMessages.TopicPublish>(msg =>
             {
-                _inputs = msg.InputTopics.Select(dt => KeyValuePair.Create(dt.TopicName, dt.DataType)).ToDictionary(source => source.Key, source => source.Value);
-                _outputs = msg.OutputTopics.Select(dt => KeyValuePair.Create(dt.TopicName, dt.DataType)).ToDictionary(source => source.Key, source => source.Value);
+                _inputs = msg.InputTopics.Select(dt => (Key:dt.TopicName, Value:dt.DataType)).ToDictionary(source => source.Key, source => source.Value);
+                _outputs = msg.OutputTopics.Select(dt => (Key:dt.TopicName, Value:dt.DataType)).ToDictionary(source => source.Key, source => source.Value);
                 
                 _registry.Tell(new RegistryMessages.RegisterPlugin(_name, msg.InputTopics, msg.OutputTopics));
             });

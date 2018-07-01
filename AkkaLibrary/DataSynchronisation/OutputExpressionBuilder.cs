@@ -11,7 +11,7 @@ namespace AkkaLibrary.DataSynchronisation
     {
         private static Queue<string> CreateExtractionQueue(string extractionString)
         {
-            return new Queue<string>(extractionString.Split(".", StringSplitOptions.RemoveEmptyEntries));
+            return new Queue<string>(extractionString.Split(new[]{"."}, StringSplitOptions.RemoveEmptyEntries));
         }
 
         public static LambdaExpression BuildAssignmentExpression(Type sourceType, string assignmentMapping)
@@ -83,7 +83,7 @@ namespace AkkaLibrary.DataSynchronisation
                 var propertyName = assign.Substring(0, openIndex);
 
                 //If the final character isn't a close bracket or the property name is empty, fail.
-                if (!assign.EndsWith(']') || string.IsNullOrEmpty(propertyName))
+                if (!assign.EndsWith("]") || string.IsNullOrEmpty(propertyName))
                 {
                     return new UnknownAssignmentType(assign);
                 }
@@ -95,7 +95,7 @@ namespace AkkaLibrary.DataSynchronisation
                     return new EnumerableAssignmentType(propertyName, index);
                 }
 
-                var kvp = contents.Split('|', StringSplitOptions.RemoveEmptyEntries);
+                var kvp = contents.Split(new[]{"|"}, StringSplitOptions.RemoveEmptyEntries);
                 if (kvp.Length != 2)
                 {
                     return new UnknownAssignmentType(assign);

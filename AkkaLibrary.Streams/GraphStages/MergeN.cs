@@ -5,6 +5,7 @@ using System.Linq;
 using Akka.Streams;
 using Akka.Streams.Stage;
 using AkkaLibrary.Common.Interfaces;
+using AkkaLibrary.Common.Utilities;
 using NETCoreAsio.DataStructures;
 
 namespace AkkaLibrary.Streams.GraphStages
@@ -120,7 +121,7 @@ namespace AkkaLibrary.Streams.GraphStages
                     });
 
                 // Set the handlers for the secondary streams
-                foreach (var (inlet, queue) in _secondaryQueues)
+                foreach (var (inlet, queue) in _secondaryQueues.Select(kvp => (kvp.Key, kvp.Value)))
                 {
                     SetHandler(
                         inlet,
@@ -380,18 +381,5 @@ namespace AkkaLibrary.Streams.GraphStages
             }
         }
         #endregion
-    }
-
-    public static class CircularQueueExtensions
-    {
-        public static T Head<T>(this CircularQueue<T> queue)
-        {
-            return queue[0];
-        }
-
-        public static T Second<T>(this CircularQueue<T> queue)
-        {
-            return queue[1];
-        }
     }
 }

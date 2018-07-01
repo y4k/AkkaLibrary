@@ -20,7 +20,7 @@
 #load .cake/test.cake
 #load .cake/restore.cake
 #load .cake/run.cake
-#load .cake/package.cake
+#load .cake/nuget.cake
 
 // Default
 Task("Default")

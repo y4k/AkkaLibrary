@@ -17,8 +17,7 @@ var runBootstrapper = Task("Run-TestHarness")
     };
 
     DotNetCoreRun(project, new ProcessArgumentBuilder(), settings);
-})
-.IsDependentOn(buildTestHarness);
+});
 
 var runClusterTestHarness = Task("Run-ClusterTestHarness")
 .Description(TaskDescriptions.Run)
@@ -31,5 +30,4 @@ var runClusterTestHarness = Task("Run-ClusterTestHarness")
     };
 
     DotNetCoreRun(project, new ProcessArgumentBuilder(), settings);
-})
-.IsDependentOn(buildClusterTestHarness);
+});

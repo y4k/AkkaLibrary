@@ -35,7 +35,7 @@ namespace AkkaLibrary
                 var terminatedTask = system.WhenTerminated;
                 terminatedTask.Wait();
 
-                Log.Information($"System completed: {terminatedTask.IsCompletedSuccessfully}");
+                Log.Information($"System completed: {terminatedTask.IsCompleted}");
             }
 
             Log.CloseAndFlush();

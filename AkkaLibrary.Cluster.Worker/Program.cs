@@ -70,7 +70,7 @@ namespace AkkaLibrary.Cluster.Worker
                         new DefaultClusterConfig(
                             hostname, 0,
                             seedNodes: new[] { seedNode },
-                            roles: roles.Select(x => KeyValuePair.Create(x, 0)).ToDictionary(x => x.Key, x => x.Value)
+                            roles: roles.Select(x => (Key:x,Value: 0)).ToDictionary(x => x.Key, x => x.Value)
                             )
                         )
                     )

@@ -12,7 +12,7 @@ namespace AkkaLibrary.DataSynchronisation
     {
         private static Queue<string> CreateExtractionQueue(string extractionString)
         {
-            return new Queue<string>(extractionString.Split(".", StringSplitOptions.RemoveEmptyEntries));
+            return new Queue<string>(extractionString.Split(new []{"."}, StringSplitOptions.RemoveEmptyEntries));
         }
 
         public static LambdaExpression BuildExtractionExpression(Type sourceType, string extraction)
@@ -173,7 +173,7 @@ namespace AkkaLibrary.DataSynchronisation
                 var propertyName = ext.Substring(0,openIndex);
 
                 //If the final character isn't a close bracket or the property name is empty, fail.
-                if(!ext.EndsWith(']') || string.IsNullOrEmpty(propertyName))
+                if(!ext.EndsWith("]") || string.IsNullOrEmpty(propertyName))
                 {
                     return new UnknownExtractionType(ext);
                 }
@@ -189,7 +189,7 @@ namespace AkkaLibrary.DataSynchronisation
                     return new KeyEnumerableExtractionType(propertyName, contents);
                 }
 
-                var kvp = contents.Split('|', StringSplitOptions.RemoveEmptyEntries);
+                var kvp = contents.Split(new[]{"|"}, StringSplitOptions.RemoveEmptyEntries);
                 if(kvp.Length != 2)
                 {
                     return new UnknownExtractionType(ext);

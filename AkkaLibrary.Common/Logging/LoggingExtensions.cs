@@ -1,6 +1,7 @@
 using Akka.Actor;
 using Akka.Event;
 using Akka.Logger.Serilog;
+using Serilog;
 
 namespace AkkaLibrary.Common.Logging
 {
@@ -36,11 +37,15 @@ namespace AkkaLibrary.Common.Logging
         /// <param name="identity">Identity string</param>
         /// <returns></returns>
         public static SerilogLoggingAdapter WithIdentity(this IActorContext context, string identity) => context.WithSerilog().WithProperty("Identity", identity);
-        // public static ILoggingAdapter WithIdentity(this IActorContext actorContext, string identity)
-        // {
-        //     return actorContext.WithSerilog().WithIdentity(identity);
-        // }
 
+        /// <summary>
+        /// Adds a value to a given property 
+        /// </summary>
+        /// <param name="adapter"></param>
+        /// <param name="propertyName"></param>
+        /// <param name="value"></param>
+        /// <param name="destructureObjects"></param>
+        /// <returns></returns>
         private static SerilogLoggingAdapter WithProperty(this SerilogLoggingAdapter adapter, string propertyName, object value, bool destructureObjects = false)
             => adapter.ForContext(propertyName, value, destructureObjects) as SerilogLoggingAdapter;
         
@@ -58,6 +63,29 @@ namespace AkkaLibrary.Common.Logging
         {
             return loggingAdapter.ForContext(Identity, identity, true);
         }
+
+        #endregion
+
+        #region General ILogger Extensions
+
+        /// <summary>
+        /// Assigns a string to the Identity logging property
+        /// </summary>
+        /// <param name="logger"></param>
+        /// <param name="identity"></param>
+        /// <returns></returns>
+        public static ILogger WithIdentity(this ILogger logger, string identity) => logger.WithProperty("Identity", identity);
+
+        /// <summary>
+        /// Adds a value to a given property
+        /// </summary>
+        /// <param name="logger"></param>
+        /// <param name="propertyName"></param>
+        /// <param name="value"></param>
+        /// <param name="destructureObjects"></param>
+        /// <returns></returns>
+        private static ILogger WithProperty(this ILogger logger, string propertyName, object value, bool destructureObjects = false)
+            => logger.ForContext(propertyName, value, destructureObjects);
 
         #endregion
 

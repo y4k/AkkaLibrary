@@ -5,7 +5,6 @@
 var target = Argument("target", "Default");
 var configuration = Argument("configuration", "Debug");
 var runtime = Argument("runtime", "linux-x64");
-var framework = Argument("framework", "netcoreapp2.0");
 
 ///////////////////////////////////////////////////////////////////////////////
 // Standard parameters
@@ -16,6 +15,8 @@ readonly string TestDirectory = $"{OutputDirectoryRoot}Tests/";
 readonly string TestResultsDirectory = $"{OutputDirectoryRoot}/TestResults/";
 readonly string TestHarnessDirectory = $"{OutputDirectoryRoot}/TestHarness/";
 readonly string ArtifactsDirectory = $"{OutputDirectoryRoot}/Artifacts/";
+readonly string PackagesDirectory = $"{OutputDirectoryRoot}/Packages/";
+
 public static class TaskDescriptions
 {
     public static readonly string Build = "Build";

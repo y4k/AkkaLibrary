@@ -18,7 +18,7 @@
     <Content Include="LogActor.cs" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Akka.Streams" Version="1.3.5" />
+    <PackageReference Include="Akka.Streams" Version="1.3.8" />
     <Content Include="LoggingActor.cs" />
     <Content Include="config.hocon">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

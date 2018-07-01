@@ -9,7 +9,8 @@ var testLibrary = Task("Test-Library")
 .Does(() =>
 {
     var name = "AkkaLibrary.Test";
-
+    var framework = "netcoreapp2.0";
+    
     Information($"Testing {name}");
 
     var outputDirectory = $"{TestDirectory}/{configuration}/{framework}/{runtime}/{name}/";
@@ -38,14 +39,15 @@ var testLibrary = Task("Test-Library")
 
     DotNetCoreTest(project,testSettings);
 })
-.IsDependentOn(buildLibraryTests);
+.IsDependentOn(buildAllTests);
 
 var testCluster = Task("Test-Cluster")
 .Description(TaskDescriptions.RunTest)
 .Does(() =>
 {
     var name = "AkkaLibrary.Cluster.Test";
-
+    var framework = "netcoreapp2.0";
+    
     Information($"Testing {name}");
 
     var outputDirectory = $"{TestDirectory}/{configuration}/{framework}/{runtime}/{name}/";
@@ -74,14 +76,15 @@ var testCluster = Task("Test-Cluster")
 
     DotNetCoreTest(project,testSettings);
 })
-.IsDependentOn(buildClusterTests);
+.IsDependentOn(buildAllTests);
 
 var testStreams = Task("Test-Streams")
 .Description(TaskDescriptions.RunTest)
 .Does(() =>
 {
     var name = "AkkaLibrary.Streams.Test";
-
+    var framework = "netcoreapp2.0";
+    
     Information($"Testing {name}");
 
     var outputDirectory = $"{TestDirectory}/{configuration}/{framework}/{runtime}/{name}/";
@@ -110,4 +113,10 @@ var testStreams = Task("Test-Streams")
 
     DotNetCoreTest(project,testSettings);
 })
-.IsDependentOn(buildAkkaLibraryStreamsTest);
+.IsDependentOn(buildAllTests);
+
+var runAllTests = Task("Test-All")
+.IsDependentOn(testLibrary)
+.IsDependentOn(testCluster)
+.IsDependentOn(testStreams)
+;

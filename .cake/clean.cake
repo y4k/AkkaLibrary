@@ -28,6 +28,11 @@ var cleanTestResults = Task("Clean-Test-Results")
 .Does(() => CleanDirectory(TestResultsDirectory))
 .IsDependentOn(cleanProject);
 
+var cleanPackages = Task("Clean-Packages")
+.ContinueOnError()
+.Description(TaskDescriptions.Clean)
+.Does(() => CleanDirectory(PackagesDirectory));
+
 var cleanOutput = Task("Clean-Output")
 .ContinueOnError()
 .Description(TaskDescriptions.Clean)
@@ -66,4 +71,5 @@ var cleanCakeToolsAll = Task("Clean-Cake-Tools")
 
 var cleanAll = Task("Clean-All")
 .Description(TaskDescriptions.Clean)
+.IsDependentOn(cleanBinObj)
 .IsDependentOn(cleanOutput);
