@@ -16,58 +16,69 @@ namespace AkkaLibrary.Hardware.Managers
     /// </summary>
     public class InkyPhatManager : ReceiveActor
     {
-        private readonly InkyPhat _manager;
+        private readonly IInkyPhatController _inkyController;
         private readonly ILoggingAdapter _logger;
         private long _currentDrawId = 0;
 
-        public InkyPhatManager()
+        /// <inheritdoc/>
+        public InkyPhatManager(IInkyPhatController inkyController = null)
         {
             _logger = Context.WithIdentity("InkyPhatManager");
-            if (InkyPhat.Instance.Initialise())
+            _inkyController = inkyController ?? InkyPhat.Instance;
+            if (!_inkyController.Initialise())
             {
                 throw new HardwareInitialisationException();
             }
-            _manager = InkyPhat.Instance;
-
+            
             Become(AcceptingDraw);
         }
 
+        /// <inheritdoc/>
         private void DrawingInProgress()
         {
             Receive<Draw>(msg =>
             {
                 _logger.Debug("Received a new draw request while currently executing draw:{DrawId}", _currentDrawId);
-                Sender.Tell(new CurrentlyDrawing(_currentDrawId));
+                Sender.Tell(new DrawRejected(_currentDrawId));
             });
 
             Receive<DrawComplete>(msg => 
             {
+                msg.DrawRequester.Tell(msg);
                 if(msg.Success)
                 {
-                    _logger.Debug("Successfully completed draw:{DrawId}", msg.Id);
+                    _logger.Debug("Successfully completed draw:{DrawId}", msg.DrawId);
                 }
                 else
                 {
-                    _logger.Warning("Did not successfully complete draw:{DrawId}", msg.Id);
+                    _logger.Warning("Did not successfully complete draw:{DrawId}", msg.DrawId);
                 }
+                _currentDrawId++;
                 Become(AcceptingDraw);
             });
         }
 
+        /// <inheritdoc/>
         private void AcceptingDraw()
         {
             Receive<Draw>(msg =>
             {
-                Task.Run(() => (_currentDrawId++, _manager.Draw(msg.Pixels)))
-                .ContinueWith(task => new DrawComplete(task.Result))
+                var sender = Sender;
+                var id = _currentDrawId;
+                Task.Run(() => (id, _inkyController.Draw(msg.Pixels)))
+                .ContinueWith(task => new DrawComplete(task.Result, sender))
                 .PipeTo(Self, Self);
+                Sender.Tell(new DrawAccepted(id));
                 Become(DrawingInProgress);
             });
         }
 
+        /// <summary>
+        /// Once the actor is stopped, the InkyInstance is shutdown gracefully
+        /// </summary>
         public override void AroundPostStop()
         {
-            InkyPhat.Instance.Shutdown();
+            _inkyController.Shutdown();
         }
 
         #region Messages
@@ -89,13 +100,13 @@ namespace AkkaLibrary.Hardware.Managers
         /// Message sent back to sender of Draw call
         /// that indicate InkyPhat is currently drawing
         /// </summary>
-        public sealed class CurrentlyDrawing
+        public sealed class DrawRejected
         {
-            public long CurrentDrawId { get; }
+            public long DrawId { get; }
 
-            public CurrentlyDrawing(long currentDrawId)
+            public DrawRejected(long currentDrawId)
             {
-                CurrentDrawId = currentDrawId;
+                DrawId = currentDrawId;
             }
         }
 
@@ -105,16 +116,32 @@ namespace AkkaLibrary.Hardware.Managers
         /// </summary>
         public sealed class DrawComplete
         {
-            public long Id { get; }
+            public long DrawId { get; }
             public bool Success { get; }
+            public IActorRef DrawRequester { get; }
 
-            public DrawComplete((long id, bool success) result)
-             : this(result.id, result.success) { }
+            public DrawComplete((long id, bool success) result, IActorRef requester)
+             : this(result.id, result.success, requester) { }
 
-            public DrawComplete(long id, bool success)
+            public DrawComplete(long id, bool success, IActorRef requester)
             {
-                Id = id;
+                DrawId = id;
                 Success = success;
+                DrawRequester = requester;
+            }
+        }
+
+        /// <summary>
+        /// Sent to the requester of a draw to indicate that
+        /// the draw update has been accepted
+        /// </summary>
+        public sealed class DrawAccepted
+        {
+            public long DrawId;
+
+            public DrawAccepted(long drawId)
+            {
+                DrawId = drawId;
             }
         }
 

@@ -9,8 +9,11 @@ namespace AkkaLibrary.Hardware.StaticWrappers
     /// <summary>
     /// Singleton class that controls InkyPhat hardware on a Raspberry Pi
     /// </summary>
-    public class InkyPhat
+    public class InkyPhat : IInkyPhatController
     {
+        public static readonly int Width = 104;
+        public static readonly int Height = 212;
+        
         // The singleton instance
         private static InkyPhat _instance;
 
@@ -111,13 +114,50 @@ namespace AkkaLibrary.Hardware.StaticWrappers
                 return false;
             }
         }
-
-        private static readonly int Width = 104;
-        private static readonly int Height = 212;
     }
 
-    internal static class EnumeratorExtensions
+    /// <summary>
+    /// Controller interface for InkyPhat
+    /// </summary>
+    public interface IInkyPhatController
     {
+        /// <summary>
+        /// Initialises InkyPhat controller
+        /// Further functions should not be callable unless
+        /// initialised
+        /// </summary>
+        /// <returns>True if initialised</returns>
+        bool Initialise();
+        
+        /// <summary>
+        /// Takes a 
+        /// </summary>
+        /// <param name="pixels"></param>
+        /// <returns>True if draw successful</returns>
+        bool Draw(InkyPhatColours[,] pixels);
+        
+        /// <summary>
+        /// Uninitialises and frees resources associated with
+        /// InkyPhat
+        /// 
+        /// Requires Initialise to be called again before InkyPhat
+        /// can be used again
+        /// </summary>
+        /// <returns>True if shutdown successfully</returns>
+        bool Shutdown();
+    }
+
+    /// <summary>
+    /// Extensions to aid dealing with multi
+    /// </summary>
+    public static class MultiDimensionalArrayExtensions
+    {
+        /// <summary>
+        /// Takes a multidimensional array and flattens it by iterating over
+        /// each of the inner arrays in order
+        /// </summary>
+        /// <param name="T[,]">Rank 2 array</param>
+        /// <returns name="IEnumerable<T>">Flattened array as IEnumerable</returns>
         public static IEnumerable<T> Enumerate<T>(this T[,] array)
         {
             var enumerator = array.GetEnumerator();
@@ -128,6 +168,9 @@ namespace AkkaLibrary.Hardware.StaticWrappers
         }
     }
 
+    /// <summary>
+    /// Defines colours used on InkyPhat
+    /// </summary>
     public enum InkyPhatColours
     {
         WHITE = 0,
