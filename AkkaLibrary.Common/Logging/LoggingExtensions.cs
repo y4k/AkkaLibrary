@@ -24,7 +24,7 @@ namespace AkkaLibrary.Common.Logging
         // {
         //     return actorContext.GetLogger<SerilogLoggingAdapter>();
         // }
-        public static SerilogLoggingAdapter WithSerilog(this IActorContext context) => context.GetLogger<SerilogLoggingAdapter>() as SerilogLoggingAdapter;
+        public static ILoggingAdapter WithSerilog(this IActorContext context) => context.GetLogger<SerilogLoggingAdapter>();
 
         #endregion
 
@@ -36,7 +36,7 @@ namespace AkkaLibrary.Common.Logging
         /// <param name="actorContext">An Actor Context</param>
         /// <param name="identity">Identity string</param>
         /// <returns></returns>
-        public static SerilogLoggingAdapter WithIdentity(this IActorContext context, string identity) => context.WithSerilog().WithProperty("Identity", identity);
+        public static ILoggingAdapter WithIdentity(this IActorContext context, string identity) => context.WithSerilog().WithProperty("Identity", identity);
 
         /// <summary>
         /// Adds a value to a given property 
@@ -46,7 +46,7 @@ namespace AkkaLibrary.Common.Logging
         /// <param name="value"></param>
         /// <param name="destructureObjects"></param>
         /// <returns></returns>
-        private static SerilogLoggingAdapter WithProperty(this SerilogLoggingAdapter adapter, string propertyName, object value, bool destructureObjects = false)
+        private static ILoggingAdapter WithProperty(this ILoggingAdapter adapter, string propertyName, object value, bool destructureObjects = false)
             => adapter.ForContext(propertyName, value, destructureObjects) as SerilogLoggingAdapter;
         
         #endregion

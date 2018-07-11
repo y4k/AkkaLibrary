@@ -20,14 +20,12 @@ namespace AkkaLibrary.Hardware.StaticWrappers
         public static BlinktPhat Instance
             => _instance == null ? _instance = new BlinktPhat() : _instance;
         
-        private volatile bool running = false;
+        private volatile bool _running = false;
         private object _lock = new object();
         private ILogger _logger;
 
         protected BlinktPhat()
-        {
-            _logger = LoggerFactory.Logger.WithIdentity("BlinktPhat");
-        }
+            => _logger = LoggerFactory.Logger.WithIdentity("BlinktPhat");
 
         /// <summary>
         /// Initialises the Blinkt Phat library
@@ -37,9 +35,9 @@ namespace AkkaLibrary.Hardware.StaticWrappers
         {
             lock(_lock)
             {
-                if (running)
+                if (_running)
                 {
-                    if (BlinktPhatWrapper.Initialise() == 0 ? running = true: running = false)
+                    if (BlinktPhatWrapper.Initialise() == 0 ? _running = true: _running = false)
                     {
                         _logger.Debug("Initialised correctly");
                         return true;
@@ -63,9 +61,9 @@ namespace AkkaLibrary.Hardware.StaticWrappers
         {
             lock(_lock)
             {
-                if (running)
+                if (_running)
                 {
-                    if(BlinktPhatWrapper.Shutdown() == 0 ? running = true: running = false)
+                    if(BlinktPhatWrapper.Shutdown() == 0 ? _running = true: _running = false)
                     {
                         _logger.Debug("Shutdown correctly");
                         return true;
@@ -89,7 +87,7 @@ namespace AkkaLibrary.Hardware.StaticWrappers
         {
             lock(_lock)
             {
-                if (running)
+                if (_running)
                 {
                     if(BlinktPhatWrapper.OnAll(r, g, b, 3) == 0)
                     {
@@ -115,7 +113,7 @@ namespace AkkaLibrary.Hardware.StaticWrappers
         {
             lock(_lock)
             {
-                if (running)
+                if (_running)
                 {
                     if(BlinktPhatWrapper.OnPixel(pixel, r, g, b, 3) != 0)
                     {
@@ -141,7 +139,7 @@ namespace AkkaLibrary.Hardware.StaticWrappers
         {
             lock(_lock)
             {
-                if (running)
+                if (_running)
                 {
                     if(BlinktPhatWrapper.OffAll() != 0)
                     {
@@ -167,7 +165,7 @@ namespace AkkaLibrary.Hardware.StaticWrappers
         {
             lock(_lock)
             {
-                if (running)
+                if (_running)
                 {
                     if(BlinktPhatWrapper.OffPixel(pixel) != 0)
                     {
@@ -193,7 +191,7 @@ namespace AkkaLibrary.Hardware.StaticWrappers
         {
             lock(_lock)
             {
-                if (running)
+                if (_running)
                 {
                     if(BlinktPhatWrapper.SetPixels(r, g, b, 3) != 0)
                     {
@@ -219,7 +217,7 @@ namespace AkkaLibrary.Hardware.StaticWrappers
         {
             lock(_lock)
             {
-                if (running)
+                if (_running)
                 {
                     if(BlinktPhatWrapper.SetPixel(pixel, r, g, b, 3) != 0)
                     {
@@ -245,7 +243,7 @@ namespace AkkaLibrary.Hardware.StaticWrappers
         {
             lock(_lock)
             {
-                if (running)
+                if (_running)
                 {
                     if(BlinktPhatWrapper.Update() != 0)
                     {

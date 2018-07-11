@@ -2,26 +2,11 @@
 created by diana probst from skeleton of original blinkt python library from pimoroni
 */
 
-//#include <functional>
-#include <bcm2835.h>
-#include <stdint.h>
-//#include <iostream>
-#include <string>
-#include <linux/types.h>
-#include <signal.h> // some kind of magic I guess
-//#include <chrono>  // milliseconds
-//#include <thread>  // sleep_for
-#include <unistd.h>  // usleep
-#include <stdlib.h>
-#include "pixel.h"
-#include "clinkt.h"
-#include "low_level.h"
-
-
 ////#ifdef TEST
 volatile int running = 0;  // I tried removing this and bad things happened
 //#endif
 
+#include "clinkt.h"
 
 int x;
 

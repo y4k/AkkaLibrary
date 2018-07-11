@@ -8,7 +8,7 @@ namespace TestHarness
 {
     public class LoggingActor : ReceiveActor
     {
-        private readonly SerilogLoggingAdapter _logger;
+        private readonly ILoggingAdapter _logger;
 
         public LoggingActor()
         {

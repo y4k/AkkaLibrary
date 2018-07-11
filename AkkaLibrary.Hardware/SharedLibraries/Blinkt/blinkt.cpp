@@ -7,6 +7,13 @@ extern "C"
 {
 int init()
 {
+	if(initialised)
+	{
+		#ifdef DEBUG
+        	cout << "init() called when already initialised" << endl;
+		#endif
+		return 2;
+	}
 	if( start() )
 	{
 		return 1;
@@ -120,6 +127,10 @@ int update()
 
 int shutdown()
 {
+	if(!initialised)
+	{
+		return 1;
+	}
 	off_all();
 	stop();
 	initialised = false;

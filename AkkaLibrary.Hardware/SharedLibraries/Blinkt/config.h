@@ -1,10 +1,10 @@
 // Contains const defintions of things like default pixel number, default brightness, and so on.  Turning points for rectangular pixel arrays also probably go here.
 
-
 // Include Guard ------------------------------------------------------------------------
 #ifndef CONFIG_H
 #define CONFIG_H
 
+#include "clinkt.h"
 
 // communication with a Raspberry Pi
 const int MOSI=23;
