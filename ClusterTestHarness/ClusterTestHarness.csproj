@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <NoWarn>NU1605</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <Content Include="Program.cs" />
+    <Content Include="hub.hocon" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Serilog.Sinks.Elasticsearch" Version="6.3.0" />
+    <PackageReference Include="Akka" Version="1.3.8" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AkkaLibrary.Cluster\AkkaLibrary.Cluster.csproj" />
+    <ProjectReference Include="..\AkkaLibrary.Common\AkkaLibrary.Common.csproj" />
+    <Content Include="LogConfirmationActor.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AkkaLibrary\AkkaLibrary.csproj" />
+    <Content Include="GossipActor.cs" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,13 @@
+///////////////////////////////////////////////////////////////////////////////
+// RESTORE TASKS
+///////////////////////////////////////////////////////////////////////////////
+
+#load parameters.cake
+
+var nugetUpdateAll = Task("Update-Packages")
+.Description(TaskDescriptions.Nuget)
+.Does(() =>
+{
+    var projectFile = "AkkaLibrary/AkkaLibrary.csproj";
+    NuGetUpdate(projectFile);
+});

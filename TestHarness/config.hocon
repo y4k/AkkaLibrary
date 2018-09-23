@@ -1,0 +1,18 @@
+akka
+{
+    loglevel=DEBUG
+    suppress-json-serializer-warning = true
+    loggers=["Akka.Logger.Serilog.SerilogLogger, Akka.Logger.Serilog"]
+    log-dead-letters-during-shutdown = off
+    actor
+    {
+        serializers
+        {
+            hyperion = "Akka.Serialization.HyperionSerializer, Akka.Serialization.Hyperion"
+        }
+        serialization-bindings
+        {
+            "System.Object" = hyperion
+        }
+    }
+}

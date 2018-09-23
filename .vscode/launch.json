@@ -1,0 +1,82 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+
+        {
+            "name": "Debug Cluster Test Harness",
+            "type": "coreclr",
+            "request": "launch",
+            "program": "${workspaceRoot}/_output/TestHarness/Debug/netcoreapp2.0/linux-x64/ClusterTestHarness/ClusterTestHarness.dll",
+            "args": [
+            ],
+            "cwd": "${workspaceRoot}/_output/TestHarness/Debug/netcoreapp2.0/linux-x64/ClusterTestHarness/",            
+            "stopAtEntry": false,
+            "console": "integratedTerminal",
+            "enableStepFiltering" : false,
+            "logging": {
+                "moduleLoad": false
+            }
+        },
+        {
+            "name": "Debug Cluster Worker",
+            "type": "coreclr",
+            "request": "launch",
+            "program": "${workspaceRoot}/_output/Build/Debug/netcoreapp2.0/linux-x64/AkkaLibrary.Cluster.Worker/AkkaLibrary.Cluster.Worker.dll",
+            "args": [
+                "WorkerOne",
+                "worker"
+            ],
+            "cwd": "${workspaceRoot}/_output/Build/Debug/netcoreapp2.0/linux-x64/AkkaLibrary.Cluster.Worker/",
+            "stopAtEntry": false,
+            "console": "integratedTerminal",
+            "enableStepFiltering" : false,
+            "logging": {
+                "moduleLoad": false
+            }
+        },
+        {
+            "name": "Debug Cluster Manager",
+            "type": "coreclr",
+            "request": "launch",
+            "program": "${workspaceRoot}/_output/Build/Debug/netcoreapp2.0/linux-x64/AkkaLibrary.Cluster.Manager/AkkaLibrary.Cluster.Manager.dll",
+            "args": [
+            ],
+            "cwd": "${workspaceRoot}/_output/Build/Debug/netcoreapp2.0/linux-x64/AkkaLibrary.Cluster.Manager/",
+            "stopAtEntry": false,
+            "console": "integratedTerminal",
+            "enableStepFiltering" : false,
+            "logging": {
+                "moduleLoad": false
+            }
+        },
+        {
+            "name": "Debug Hub",
+            "type": "coreclr",
+            "request": "launch",
+            "program": "${workspaceRoot}/_output/Build/Debug/netcoreapp2.0/linux-x64/AkkaLibrary.Cluster.Hub/AkkaLibrary.Cluster.Hub.dll",
+            "args": [
+            ],
+            "cwd": "${workspaceRoot}/_output/Build/Debug/netcoreapp2.0/linux-x64/AkkaLibrary.Cluster.Hub/",
+            "stopAtEntry": false,
+            "console": "integratedTerminal",
+            "enableStepFiltering" : false,
+            "logging": {
+                "moduleLoad": false
+            }
+        },
+        {
+            "name": "Cake: Debug Script (mono)",
+            "type": "mono",
+            "request": "launch",
+            "program": "${workspaceRoot}/tools/Cake/Cake.exe",
+            "args": [
+                "${workspaceRoot}/main.cake",
+                "--debug",
+                "--verbosity=diagnostic",
+                "--target=Build-AkkaLibrary.Cluster.Hub"
+            ],
+            "cwd": "${workspaceRoot}",
+            "console": "internalConsole"
+        }
+    ]
+}

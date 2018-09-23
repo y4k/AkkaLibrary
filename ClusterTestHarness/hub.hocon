@@ -1,0 +1,38 @@
+akka
+{
+    loglevel = DEBUG,
+    suppress-json-serializer-warning = true,
+    loggers = [
+        "Akka.Logger.Serilog.SerilogLogger, Akka.Logger.Serilog"
+        ]
+    extensions = [
+        "Akka.Cluster.Tools.PublishSubscribe.DistributedPubSubExtensionProvider,Akka.Cluster.Tools",
+        "Akka.Cluster.Tools.Client.ClusterClientReceptionistExtensionProvider, Akka.Cluster.Tools"
+        ],
+    actor
+    {
+        provider = cluster
+        serializers
+        {
+            hyperion = "Akka.Serialization.HyperionSerializer, Akka.Serialization.Hyperion"
+        }
+        serialization-bindings
+        {
+            "System.Object" = hyperion
+        }
+    }
+
+    remote
+    {
+        dot-netty.tcp
+        {
+            transport-protocol = tcp
+            hostname = "127.0.0.1"
+        }
+    }
+
+    cluster
+    {
+        seed-nodes = ["akka.tcp://system@127.0.0.1:4053"]
+    }
+}
